@@ -11,8 +11,20 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import People from "../Interfaces/People";
 import listType from "../Interfaces/ListType";
 import Person from "../Interfaces/Person";
+import {Button} from "@mui/material";
 
-const GetJokeCategories = (listType: listType) => {
+interface IList {
+    listType: string,
+    category: string,
+    updateJokeCategory: (arg: string) => void
+}
+
+interface IFunc {
+    listType: string,
+    updateJokeCategory: (arg: string) => void
+}
+
+const GetJokeCategories = (props:IFunc) => {
     const [categoryData, setCategoryData] = useState<string[]>();
     const [isBusy, setBusy] = useState<boolean>(true);
     console.log('entering GetJokeCategories Function')
@@ -42,9 +54,7 @@ const GetJokeCategories = (listType: listType) => {
 
             <ListItem
                 key={value}
-                secondaryAction={<IconButton edge="end" aria-label="delete">
-                    <DeleteIcon/>
-                </IconButton>}
+                secondaryAction={<Button variant={"contained"} color={"secondary"} onClick={(e) => {props.updateJokeCategory(value)}}>Get Joke</Button>}
             >
                 <ListItemText
                     primary={value}
@@ -99,26 +109,26 @@ const GetPeople = (listType: listType) => {
     }
 }
 
-function Display(listType: listType) {
-    return (listType.listType === 'Categories' ? <GetJokeCategories listType={listType.listType}></GetJokeCategories> :
-        <GetPeople listType={listType.listType}></GetPeople>)
+function Display(props:IFunc) {
+    return (props.listType === 'Categories' ? <GetJokeCategories updateJokeCategory={props.updateJokeCategory} listType={props.listType} ></GetJokeCategories> :
+        <GetPeople listType={props.listType}></GetPeople>)
 }
 
 const Demo = styled('div')(({theme}) => ({
     backgroundColor: theme.palette.background.paper,
 }));
-
-export default function InteractiveList(listType: listType) {
+//listType: listType
+export default function InteractiveList(iList:IList) {
 
         return (<Box sx={{flexGrow: 1, maxWidth: 752}}>
             <Grid container spacing={2}>
                 <Grid item xs={12} md={12}>
                     <Typography sx={{mt: 4, mb: 2}} variant="h6" component="div">
-                        {listType.listType}
+                        {iList.listType}
                     </Typography>
                     <Demo>
                         <List dense={true}>
-                            <Display listType={listType.listType}></Display>
+                            <Display updateJokeCategory={iList.updateJokeCategory} listType={iList.listType}></Display>
                         </List>
                     </Demo>
                 </Grid>

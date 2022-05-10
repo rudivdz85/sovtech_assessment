@@ -13,29 +13,8 @@ import {Breadcrumbs, Button} from "@mui/material";
 import '../Styles/Layout.css'
 import InteractiveList from "./List";
 import People from "../Interfaces/People";
-
-function Copyright() {
-    return (
-        <Typography variant="body2" color="text.secondary" align="center">
-            {'Copyright © '}
-            <Link color="inherit" href="https://mui.com/">
-                Your Website
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
-
-const options:string[] = ['one','two','three']
-
-/*let menuOption:string = 'Categories';
-
-
-function ChangeMenuOption(menuChoice:string){
-    menuOption = menuChoice;
-    console.log('menu option is: ',menuOption)
-}*/
+import SearchDisplay from "./SearchDisplay";
+import JokeCard from "./JokeCard";
 
 const theme = createTheme();
 
@@ -44,40 +23,85 @@ function Layout() {
     console.log('render layout');
 
     const [menuOption, setMenuOption] = useState<string>('Categories');
-    /*function MenuChange(menuOption:string){
+    const [searchValue, setSearchValue] = useState<string>('Search for jokes or people...');
+    const [jokeCardCategory, setJokeCarCategory] = useState<string>('');
+    const [displayLists, setDisplayLists] = useState<boolean>(true);
+    const [displayJokeCard, setDisplayJokeCard] = useState<boolean>(false);
+    const [displaySearchResults, setDisplaySearchResults] = useState<boolean>(false);
 
-    }*/
+
+    function ExecSearch() {
+        setDisplaySearchResults(true);
+        setDisplayLists(false);
+        setDisplayJokeCard(false)
+    }
+
+    function ExecLists() {
+        setDisplaySearchResults(false);
+        setDisplayLists(true);
+        setDisplayJokeCard(false)
+    }
+
+    function ExecCardDisplay() {
+        setDisplayJokeCard(true);
+        setDisplayLists(false);
+        setDisplaySearchResults(false)
+    }
+
+    function DisplayComponent() {
+        if (displaySearchResults) {
+            return <SearchDisplay searchString={searchValue}></SearchDisplay>
+        } else if (displayJokeCard) {
+            return <JokeCard category={jokeCardCategory}></JokeCard>
+        } else {
+            return <InteractiveList listType={menuOption} category={jokeCardCategory}
+                                    updateJokeCategory={UpdateJokeCategory}></InteractiveList>
+        }
+    }
+
+    const UpdateJokeCategory = (category: string): void => {
+        setJokeCarCategory(category);
+        ExecCardDisplay();
+        //alert('category from child: ' + category);
+    }
 
 
-    return (
-    <ThemeProvider theme={theme}>
-        <CssBaseline />
+    return (<ThemeProvider theme={theme}>
+        <CssBaseline/>
         <AppBar position="relative">
             <Toolbar>
                 <Breadcrumbs aria-label="breadcrumb" className='links'>
-                    <Button color="inherit" onClick={(e) => setMenuOption('Categories')}>Jokes</Button>
-                    <Button color="inherit" onClick={(e) => setMenuOption('People')}>People</Button>
+                    <Button color="inherit" onClick={(e) => {
+                        setMenuOption('Categories');
+                        ExecLists();
+                    }}>Jokes</Button>
+                    <Button color="inherit" onClick={(e) => {
+                        setMenuOption('People');
+                        ExecLists();
+                    }}>People</Button>
                 </Breadcrumbs>
-                <Autocomplete
-                    className='autocomplete'
-                    disablePortal={false}
-                    id="combo-box-demo"
-                    options={options}
-                    sx={{ width: 300 }}
-                    renderInput={(params) => <TextField {...params} label="Search for jokes or people..." />}
-                />
+                <TextField id="outlined-basic" label={searchValue} variant="outlined" onBlur={(e) => setSearchValue('')}
+                           onChange={(e) => setSearchValue(e.target.value)} onKeyUp={(e) => {
+                    if (e.code === "Enter") {
+                        ExecSearch();
+                    }
+                }} InputProps={{
+                    endAdornment: <Button color="inherit" onClick={(e) => {
+                        ExecSearch()
+                    }}>Search</Button>
+                }}/>
             </Toolbar>
 
         </AppBar>
         <main>
-            <Container sx={{ py: 3 }} maxWidth="md">
-               <InteractiveList listType={menuOption}></InteractiveList>
+            <Container sx={{py: 3}} maxWidth="md">
+                <DisplayComponent></DisplayComponent>
             </Container>
         </main>
         {/* Footer */}
-        <Box sx={{ bgcolor: 'background.paper', p: 6 }} component="footer">
+        <Box sx={{bgcolor: 'background.paper', p: 6}} component="footer">
             <Typography variant="h6" align="center" gutterBottom>
-                Footer
+                Rudi van der Zee
             </Typography>
             <Typography
                 variant="subtitle1"
@@ -85,13 +109,11 @@ function Layout() {
                 color="text.secondary"
                 component="p"
             >
-                Something here to give the footer a purpose!
+                Sovtech Technical Assessment
             </Typography>
-            <Copyright />
         </Box>
         {/* End footer */}
-    </ThemeProvider>
-    )
+    </ThemeProvider>)
 }
 
 export default Layout

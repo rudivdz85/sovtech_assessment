@@ -1,7 +1,7 @@
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import List from "@mui/material/List";
-import React, {useEffect, useState} from "react";
+import React, {ReactElement, useEffect, useState} from "react";
 import {styled} from "@mui/material/styles";
 import Person from "../Interfaces/Person";
 import ListItem from "@mui/material/ListItem";
@@ -23,7 +23,8 @@ const GetSearchedItems = (searchString: SearchString) => {
     useEffect(() => {
         async function FetchData() {
             console.log('Fetching people data now');
-            const response = await fetch("https://localhost:7176/Search?query=" + searchString);
+            const response = await fetch("https://localhost:7176/Search?query=" + searchString.searchString);
+            //console.log('response: ' + response.json())
             const body: SearchedItems = await response.json();
             setItemData(body);
             console.log('Searched Item data set as: ' + itemData)
@@ -37,43 +38,69 @@ const GetSearchedItems = (searchString: SearchString) => {
     }, []);
 
 
+    let elementArray: ReactElement[] = [];
+
     if (isBusy) {
         console.log('Loading Fetch for people!');
         return <span>Loading Fetch for People</span>
     } else if (itemData !== undefined) {
 
         if (itemData.people.results.length > 0) {
-            return <> {itemData.people.results?.map((value: Person) =>
+            elementArray.push(<Grid item xs={6} md={6} lg={6}>
+                <Typography sx={{mt: 4, mb: 2}} variant="h6" component="div">
+                    People:
+                </Typography>
+                <Demo>
+                    <List dense={true}>
+                        {itemData.people.results?.map((value: Person) => <ListItem
+                            key={value.name}
+                            secondaryAction={<IconButton edge="end" aria-label="delete">
+                                <DeleteIcon/>
+                            </IconButton>}
+                        >
+                            <ListItemText
+                                primary={value.name}
+                            />
+                        </ListItem>)}
+                    </List>
+                </Demo>
+            </Grid>)
 
-                <ListItem
-                    key={value.name}
-                    secondaryAction={<IconButton edge="end" aria-label="delete">
-                        <DeleteIcon/>
-                    </IconButton>}
-                >
-                    <ListItemText
-                        primary={value.name}
-                    />
-                </ListItem>)}</>
-        }
-
-        if (itemData?.jokes.result.length > 0) {
-            return <> {itemData.jokes.result?.map((value: Joke) =>
-
-                <ListItem
-                    key={value.id}
-                    secondaryAction={<IconButton edge="end" aria-label="delete">
-                        <DeleteIcon/>
-                    </IconButton>}
-                >
-                    <ListItemText
-                        primary={value.value}
-                    />
-                </ListItem>)}</>
         } else {
-            return <span>Loading Searched Items</span>
+            elementArray.push(<Grid item xs={6} md={6}>
+                <span>No People Results</span>
+            </Grid>)
         }
 
+        if (itemData.jokes.result.length > 0) {
+            elementArray.push(<Grid item xs={6} md={6} lg={6}>
+                <Typography sx={{mt: 4, mb: 2}} variant="h6" component="div">
+                    Jokes:
+                </Typography>
+                <Demo>
+                    <List dense={true}>
+                        {itemData.jokes.result?.map((value: Joke) =>
+
+                            <ListItem
+                                key={value.id}
+                                secondaryAction={<IconButton edge="end" aria-label="delete">
+                                    <DeleteIcon/>
+                                </IconButton>}
+                            >
+                                <ListItemText
+                                    primary={value.value}
+                                />
+                            </ListItem>)}
+                    </List>
+                </Demo>
+            </Grid>)
+        } else {
+            elementArray.push(<Grid item xs={6} md={6}>
+                <span>No Joke Results</span>
+            </Grid>)
+        }
+
+        return <Grid container-spacing={2} container direction={'row'}>{elementArray}</Grid>;
 
     } else {
         return <span>Still Loading Searched Items</span>
@@ -85,35 +112,7 @@ const Demo = styled('div')(({theme}) => ({
 }));
 
 const SearchDisplay = (searchString: SearchString) => {
-    return (<div>
-            <Grid container spacing={2}>
-                <Grid container spacing={2}>
-                    <Grid item xs={6} md={6}>
-                        <Typography sx={{mt: 4, mb: 2}} variant="h6" component="div">
-                            Jokes:
-                        </Typography>
-                        <Demo>
-                            <List dense={true}>
-                                <GetSearchedItems searchString={searchString.searchString}></GetSearchedItems>
-                            </List>
-                        </Demo>
-                    </Grid>
-                </Grid>
-            </Grid>
-
-            <Grid container spacing={2}>
-                <Grid item xs={6} md={6}>
-                    <Typography sx={{mt: 4, mb: 2}} variant="h6" component="div">
-                        People:
-                    </Typography>
-                    <Demo>
-                        <List dense={true}>
-                            {/*  <Display listType={listType.listType}></Display>*/}
-                        </List>
-                    </Demo>
-                </Grid>
-            </Grid>
-        </div>)
+    return (<GetSearchedItems searchString={searchString.searchString}></GetSearchedItems>)
 }
 
 export default SearchDisplay;

@@ -5,11 +5,28 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import {useEffect, useState} from "react";
+import {ReactElement, useEffect, useState} from "react";
 import Joke from "../Interfaces/Joke";
+import Grid from "@mui/material/Grid";
 
 interface Category {
     category: string
+}
+
+interface Categories {
+    categories: string[]
+}
+
+
+const PopCategories = (categories: Categories) => {
+    let elementArr: ReactElement[] = [];
+    if (categories != null || categories !== undefined) {
+        categories?.categories.forEach((category) => {
+            elementArr.push(<span key={category}>{category}</span>)
+        })
+    } else elementArr.push(<span>None</span>);
+
+    return <span>{elementArr}</span>;
 }
 
 const GetRandomJoke = (category: Category) => {
@@ -38,32 +55,39 @@ const GetRandomJoke = (category: Category) => {
         return <span>Loading Fetch for Joke</span>
     } else if (jokeData !== undefined) {
 
-        return (<Typography variant="body2" color="text.secondary">
-                {jokeData?.value}
-            </Typography>)
+        //alert(jokeData.icon_url);
+
+        return (<div style={{display: 'flex', justifyContent: 'center'}}>
+            <Card sx={{maxWidth: 345}}>
+                <CardMedia
+                    component="img"
+                    height="100"
+                    src={'https://picsum.photos/100'}
+                    alt="Icon"
+                />
+                <CardContent>
+                    <Typography gutterBottom variant="h6" component="div">
+                        Categories: <PopCategories categories={jokeData.categories}></PopCategories>
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        {jokeData?.value}
+                    </Typography>
+                </CardContent>
+                <CardActions>
+                    <Button size="small">Exit</Button>
+                    <Button size="small">New Joke</Button>
+                </CardActions>
+            </Card>
+        </div>)
     } else {
         return <span>Still Loading People</span>
     }
 }
 
 
-export default function JokeCard(category: Category) {
-    return (<Card sx={{maxWidth: 345}}>
-            <CardMedia
-                component="img"
-                height="140"
-                image="/static/images/cards/contemplative-reptile.jpg"
-                alt="green iguana"
-            />
-            <CardContent>
-                <Typography gutterBottom variant="h5" component="div">
-                    Categories: (Placeholder)
-                </Typography>
-                <GetRandomJoke category={category.category}></GetRandomJoke>
-            </CardContent>
-            <CardActions>
-                <Button size="small">Share</Button>
-                <Button size="small">Learn More</Button>
-            </CardActions>
-        </Card>);
+const JokeCard = (category: Category) => {
+
+    return (<GetRandomJoke category={category.category}></GetRandomJoke>)
 }
+
+export default JokeCard;
