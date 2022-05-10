@@ -18,6 +18,7 @@ interface Categories {
 }
 
 
+
 const PopCategories = (categories: Categories) => {
     let elementArr: ReactElement[] = [];
     if (categories != null || categories !== undefined) {
@@ -30,6 +31,7 @@ const PopCategories = (categories: Categories) => {
 }
 
 const GetRandomJoke = (category: Category) => {
+    const [cardKey, setCardKey] = React.useState<number>(0);
     const [jokeData, setJokeData] = useState<Joke>();
     const [isBusy, setBusy] = useState<boolean>(true);
     console.log('Entering GetRandomJoke Function')
@@ -48,8 +50,8 @@ const GetRandomJoke = (category: Category) => {
                 console.log('setting busy to false in GetRandomJoke');
                 setBusy(false);
             });
-    }, []);
-
+    }, [cardKey]);
+//
     if (isBusy) {
         console.log('Loading Fetch for random joke!');
         return <span>Loading Fetch for Joke</span>
@@ -57,12 +59,13 @@ const GetRandomJoke = (category: Category) => {
 
         //alert(jokeData.icon_url);
 
-        return (<div style={{display: 'flex', justifyContent: 'center'}}>
+        return (<div key={cardKey} style={{display: 'flex', justifyContent: 'center'}}>
             <Card sx={{maxWidth: 345}}>
                 <CardMedia
                     component="img"
                     height="100"
-                    src={'https://picsum.photos/100'}
+                    width="200"
+                    src={'https://picsum.photos/1000/2000'}
                     alt="Icon"
                 />
                 <CardContent>
@@ -74,8 +77,7 @@ const GetRandomJoke = (category: Category) => {
                     </Typography>
                 </CardContent>
                 <CardActions>
-                    <Button size="small">Exit</Button>
-                    <Button size="small">New Joke</Button>
+                    <Button size="small" onClick={(e) => {setCardKey(key => key + 1)}}>New Joke</Button>
                 </CardActions>
             </Card>
         </div>)

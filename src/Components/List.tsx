@@ -4,14 +4,19 @@ import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-import IconButton from '@mui/material/IconButton';
+import FolderIcon from '@mui/icons-material/Folder';
+import ListItemIcon from '@mui/material/ListItemIcon';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import DeleteIcon from '@mui/icons-material/Delete';
+//import FolderIcon from '@mui/icons-material/folder';
+import MaleIcon from '@mui/icons-material/Male';
+import FemaleIcon from '@mui/icons-material/Female';
+import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import People from "../Interfaces/People";
 import listType from "../Interfaces/ListType";
 import Person from "../Interfaces/Person";
 import {Button} from "@mui/material";
+import '../Styles/List.css'
 
 interface IList {
     listType: string,
@@ -24,6 +29,31 @@ interface IFunc {
     updateJokeCategory: (arg: string) => void
 }
 
+interface Gender {
+    gender:string
+}
+
+function DisplayGender(gender:Gender){
+    if (gender.gender === 'male'){
+        return <MaleIcon></MaleIcon>
+    }
+    if (gender.gender === 'female'){
+        return <FemaleIcon></FemaleIcon>
+    }
+    else{
+        return <DoDisturbIcon></DoDisturbIcon>
+    }
+}
+
+function toTitleCase(str:string) {
+    return str.replace(
+        /\w\S*/g,
+        function(txt:string) {
+            return txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase();
+        }
+    );
+}
+
 const GetJokeCategories = (props:IFunc) => {
     const [categoryData, setCategoryData] = useState<string[]>();
     const [isBusy, setBusy] = useState<boolean>(true);
@@ -34,7 +64,10 @@ const GetJokeCategories = (props:IFunc) => {
             console.log('Fetching people data now');
             const response = await fetch("https://localhost:7176/Chuck/categories");
             const body: string[] = await response.json();
-            setCategoryData(body);
+            const upper = body.map(element => {
+                return toTitleCase(element);
+            });
+            setCategoryData(upper);
             console.log('category data set as: ' + categoryData)
         }
 
@@ -94,14 +127,15 @@ const GetPeople = (listType: listType) => {
 
         return <> {peopleData?.results.map((value: Person) =>
 
-            <ListItem
-                key={value.name}
-                secondaryAction={<IconButton edge="end" aria-label="delete">
-                    <DeleteIcon/>
-                </IconButton>}
-            >
+            <ListItem>
+                <ListItemIcon>
+
+            <DisplayGender gender={value.gender}></DisplayGender>
+            </ListItemIcon>
+
                 <ListItemText
                     primary={value.name}
+                    secondary={'Born: ' + value.birth_year}
                 />
             </ListItem>)}</>
     } else {
@@ -120,14 +154,14 @@ const Demo = styled('div')(({theme}) => ({
 //listType: listType
 export default function InteractiveList(iList:IList) {
 
-        return (<Box sx={{flexGrow: 1, maxWidth: 752}}>
+        return (<Box sx={{flexGrow: 1, maxWidth: 752}} className='listBox'>
             <Grid container spacing={2}>
                 <Grid item xs={12} md={12}>
                     <Typography sx={{mt: 4, mb: 2}} variant="h6" component="div">
                         {iList.listType}
                     </Typography>
                     <Demo>
-                        <List dense={true}>
+                        <List dense={false}>
                             <Display updateJokeCategory={iList.updateJokeCategory} listType={iList.listType}></Display>
                         </List>
                     </Demo>
