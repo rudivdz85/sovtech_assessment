@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "PsKRB2bomVLTJVyZNWakI1587rqjYvmYUXRLZYHyARw=",
+  "Source": "ChuckSwapiAPI",
+  "BasePath": "_content/ChuckSwapiAPI",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
