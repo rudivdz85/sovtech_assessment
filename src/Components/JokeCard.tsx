@@ -58,7 +58,6 @@ const GetRandomJoke = (category: Category) => {
         return <Loader></Loader>;
     } else if (jokeData !== undefined) {
 
-        //alert(jokeData.icon_url);
 
         return (<div key={cardKey} style={{display: 'flex', justifyContent: 'center'}}>
             <Card sx={{maxWidth: 1000, minHeight: 200}}>
