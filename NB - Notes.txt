@@ -1,0 +1,17 @@
+I did Include functionality for the joke card to display the icon listed on each url on each joke,however the links give me
+connection-timed-out error,so I replaced it with a different image api
+
+I am including functionality to convert some of the received objects (categories) to Title case for a better look. As they originally
+all come lowercase.
+
+I have specifically left my console.log code in the codebase to display how I think when debugging
+
+I have extended the functinality of my GetPeople API method to get all of the People from the SWapi instead of just the first page.
+
+I did not spend a lot of time on the look of the front-end and the css, only some basics to give a decent look, I can make it look much
+better but I decided to rather spend time on the functionality.
+
+I did not know React well beforehand, I had only done a small crash course and have never worked in it practically in industry before,
+however I like the way it works so that's why I chose it.
+
+I did not spend much time on exception handling in the API back-end, however this is usually something i'm more diligent on.
