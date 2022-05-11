@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import {ReactElement, useEffect, useState} from "react";
 import Joke from "../Interfaces/Joke";
 import Grid from "@mui/material/Grid";
+import Loader from "./Loader";
 
 interface Category {
     category: string
@@ -54,13 +55,13 @@ const GetRandomJoke = (category: Category) => {
 //
     if (isBusy) {
         console.log('Loading Fetch for random joke!');
-        return <span>Loading Fetch for Joke</span>
+        return <Loader></Loader>;
     } else if (jokeData !== undefined) {
 
         //alert(jokeData.icon_url);
 
         return (<div key={cardKey} style={{display: 'flex', justifyContent: 'center'}}>
-            <Card sx={{maxWidth: 345}}>
+            <Card sx={{maxWidth: 1000, minHeight: 200}}>
                 <CardMedia
                     component="img"
                     height="100"
@@ -82,7 +83,7 @@ const GetRandomJoke = (category: Category) => {
             </Card>
         </div>)
     } else {
-        return <span>Still Loading People</span>
+        return <Loader></Loader>;
     }
 }
 

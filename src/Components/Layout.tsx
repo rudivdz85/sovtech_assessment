@@ -80,8 +80,8 @@ function Layout() {
                         ExecLists();
                     }}>People</Button>
                 </Breadcrumbs>
-                <TextField id="outlined-basic" label={searchValue} variant="outlined" onBlur={(e) => setSearchValue('')}
-                           onChange={(e) => setSearchValue(e.target.value)} onKeyUp={(e) => {
+                <TextField id="outlined-basic" variant="outlined"
+                           onChange={(e) => setSearchValue(e.target.value.toLowerCase())} onKeyUp={(e) => {
                     if (e.code === "Enter") {
                         ExecSearch();
                     }

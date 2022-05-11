@@ -4,19 +4,20 @@ import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-import FolderIcon from '@mui/icons-material/Folder';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-//import FolderIcon from '@mui/icons-material/folder';
 import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import People from "../Interfaces/People";
 import listType from "../Interfaces/ListType";
 import Person from "../Interfaces/Person";
-import {Button} from "@mui/material";
+import {Avatar, Button} from "@mui/material";
 import '../Styles/List.css'
+import {TailSpin} from "react-loader-spinner";
+import Loader from "./Loader";
+import DisplayGender from "./DisplayGender";
 
 interface IList {
     listType: string,
@@ -30,31 +31,16 @@ interface IFunc {
 }
 
 interface Gender {
-    gender:string
+    gender: string
 }
 
-function DisplayGender(gender:Gender){
-    if (gender.gender === 'male'){
-        return <MaleIcon></MaleIcon>
-    }
-    if (gender.gender === 'female'){
-        return <FemaleIcon></FemaleIcon>
-    }
-    else{
-        return <DoDisturbIcon></DoDisturbIcon>
-    }
+function toTitleCase(str: string) {
+    return str.replace(/\w\S*/g, function (txt: string) {
+        return txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase();
+    });
 }
 
-function toTitleCase(str:string) {
-    return str.replace(
-        /\w\S*/g,
-        function(txt:string) {
-            return txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase();
-        }
-    );
-}
-
-const GetJokeCategories = (props:IFunc) => {
+const GetJokeCategories = (props: IFunc) => {
     const [categoryData, setCategoryData] = useState<string[]>();
     const [isBusy, setBusy] = useState<boolean>(true);
     console.log('entering GetJokeCategories Function')
@@ -79,7 +65,7 @@ const GetJokeCategories = (props:IFunc) => {
 
     console.log('returning: ' + categoryData)
     if (isBusy) {
-        return <span>Loading Fetch for Categories</span>
+        return <Loader></Loader>;
     } else if (categoryData !== undefined && categoryData.length > 0) {
         console.log('Mapping category data: ', categoryData);
 
@@ -87,64 +73,85 @@ const GetJokeCategories = (props:IFunc) => {
 
             <ListItem
                 key={value}
-                secondaryAction={<Button variant={"contained"} color={"secondary"} onClick={(e) => {props.updateJokeCategory(value)}}>Get Joke</Button>}
+                secondaryAction={<Button variant={"contained"} color={"secondary"} onClick={(e) => {
+                    props.updateJokeCategory(value.toLowerCase())
+                }}>Get Joke</Button>}
             >
                 <ListItemText
                     primary={value}
                 />
             </ListItem>)}</>
     } else {
-        return <span>Still Loading Categories</span>
+        return <Loader></Loader>;
     }
 };
 
 const GetPeople = (listType: listType) => {
-    const [peopleData, setPeopleData] = useState<People>();
+    const [peopleData, setPeopleData] = useState<People[]>();
+    const [allPeople, setAllPeople] = useState<Person[]>();
     const [isBusy, setBusy] = useState<boolean>(true);
+
     console.log('entering GetPeople Function')
 
     useEffect(() => {
         async function FetchData() {
             console.log('Fetching people data now');
             const response = await fetch("https://localhost:7176/Swapi/people");
-            const body: People = await response.json();
+            const body: People[] = await response.json();
             setPeopleData(body);
             console.log('people data set as: ' + peopleData)
+            let peopleArr: Person[] = [];
+            peopleData?.map((p) => {
+                p.results.map((person) => {
+                    peopleArr.push(person);
+                })
+            })
+            setAllPeople(peopleArr);
+            /* setTimeout(() => (2500));
+             console.log('timeout done');*/
         }
 
         FetchData()
             .then(() => {
+                console.log(allPeople);
                 console.log('setting busy to false in GetPeople');
                 setBusy(false);
+
             });
-    }, []);
+    }, [isBusy]);
 
 
     if (isBusy) {
         console.log('Loading Fetch for people!');
-        return <span>Loading Fetch for People</span>
-    } else if (peopleData !== undefined && peopleData.results.length > 0) {
+        return <Loader></Loader>;
+    } else if (allPeople === undefined || allPeople.length === 0) {
 
-        return <> {peopleData?.results.map((value: Person) =>
+        return <Loader></Loader>;
 
-            <ListItem>
+    } else {
+
+        return <> {allPeople.map((value: Person) =>
+
+            <ListItem key={value.name} className='listItem' secondaryAction={<Avatar alt={value.homeworld}
+                                                                                     src={'https://ui-avatars.com/api/?name=' + value.name}/>}>
                 <ListItemIcon>
 
-            <DisplayGender gender={value.gender}></DisplayGender>
-            </ListItemIcon>
+                    <DisplayGender gender={value.gender}></DisplayGender>
+                </ListItemIcon>
 
                 <ListItemText
                     primary={value.name}
-                    secondary={'Born: ' + value.birth_year}
+                    secondary={'Born: ' + value.birth_year + ' - Height: ' + value.height + ' - Mass: ' + value.mass}
                 />
             </ListItem>)}</>
-    } else {
+    } /*else {
         return <span>Still Loading People</span>
-    }
+    }*/
 }
 
-function Display(props:IFunc) {
-    return (props.listType === 'Categories' ? <GetJokeCategories updateJokeCategory={props.updateJokeCategory} listType={props.listType} ></GetJokeCategories> :
+function Display(props: IFunc) {
+    return (props.listType === 'Categories' ? <GetJokeCategories updateJokeCategory={props.updateJokeCategory}
+                                                                 listType={props.listType}></GetJokeCategories> :
         <GetPeople listType={props.listType}></GetPeople>)
 }
 
@@ -152,20 +159,21 @@ const Demo = styled('div')(({theme}) => ({
     backgroundColor: theme.palette.background.paper,
 }));
 //listType: listType
-export default function InteractiveList(iList:IList) {
+export default function InteractiveList(iList: IList) {
 
-        return (<Box sx={{flexGrow: 1, maxWidth: 752}} className='listBox'>
-            <Grid container spacing={2}>
-                <Grid item xs={12} md={12}>
-                    <Typography sx={{mt: 4, mb: 2}} variant="h6" component="div">
-                        {iList.listType}
-                    </Typography>
-                    <Demo>
-                        <List dense={false}>
-                            <Display updateJokeCategory={iList.updateJokeCategory} listType={iList.listType}></Display>
-                        </List>
-                    </Demo>
-                </Grid>
+    return (<Box sx={{flexGrow: 1, maxWidth: 752}} className='listBox'>
+        <Grid container spacing={2}>
+            <Grid item xs={12} md={12}>
+                <Typography sx={{mt: 4, mb: 2}} variant="h6" component="div">
+                    {iList.listType}
+                </Typography>
+                <Demo>
+                    <List dense={false}>
+                        <Display updateJokeCategory={iList.updateJokeCategory}
+                                 listType={iList.listType}></Display>
+                    </List>
+                </Demo>
             </Grid>
-        </Box>);
+        </Grid>
+    </Box>);
 }

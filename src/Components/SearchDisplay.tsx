@@ -5,11 +5,16 @@ import React, {ReactElement, useEffect, useState} from "react";
 import {styled} from "@mui/material/styles";
 import Person from "../Interfaces/Person";
 import ListItem from "@mui/material/ListItem";
+import ListItemText from '@mui/material/ListItemText';
+import ListItemIcon from '@mui/material/ListItemIcon';
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
-import ListItemText from "@mui/material/ListItemText";
 import SearchedItems from "../Interfaces/SearchedItem";
 import Joke from "../Interfaces/Joke";
+import Loader from "./Loader";
+import {Avatar, Button} from "@mui/material";
+import DisplayGender from "./DisplayGender";
+import '../Styles/SearchDisplay.css'
 
 interface SearchString {
     searchString: string | null
@@ -42,7 +47,7 @@ const GetSearchedItems = (searchString: SearchString) => {
 
     if (isBusy) {
         console.log('Loading Fetch for people!');
-        return <span>Loading Fetch for People</span>
+        return <Loader></Loader>;
     } else if (itemData !== undefined) {
 
         if (itemData.people.results.length > 0) {
@@ -53,13 +58,18 @@ const GetSearchedItems = (searchString: SearchString) => {
                 <Demo>
                     <List dense={true}>
                         {itemData.people.results?.map((value: Person) => <ListItem
+                            className='listItem'
                             key={value.name}
-                            secondaryAction={<IconButton edge="end" aria-label="delete">
-                                <DeleteIcon/>
-                            </IconButton>}
+                            secondaryAction={<Avatar alt={value.homeworld}
+                                                     src={'https://ui-avatars.com/api/?name=' + value.name}/>}
                         >
+                            <ListItemIcon>
+
+                                <DisplayGender gender={value.gender}></DisplayGender>
+                            </ListItemIcon>
                             <ListItemText
                                 primary={value.name}
+                                secondary={'Born: ' + value.birth_year + ' - Height: ' + value.height + ' - Mass: ' + value.mass}
                             />
                         </ListItem>)}
                     </List>
@@ -82,10 +92,8 @@ const GetSearchedItems = (searchString: SearchString) => {
                         {itemData.jokes.result?.map((value: Joke) =>
 
                             <ListItem
+                                className='listItem'
                                 key={value.id}
-                                secondaryAction={<IconButton edge="end" aria-label="delete">
-                                    <DeleteIcon/>
-                                </IconButton>}
                             >
                                 <ListItemText
                                     primary={value.value}
@@ -100,10 +108,10 @@ const GetSearchedItems = (searchString: SearchString) => {
             </Grid>)
         }
 
-        return <Grid container-spacing={2} container direction={'row'}>{elementArray}</Grid>;
+        return <Grid className='listBox' container-spacing={4} container direction={'row'}>{elementArray}</Grid>;
 
     } else {
-        return <span>Still Loading Searched Items</span>
+        return <Loader></Loader>;
     }
 }
 
